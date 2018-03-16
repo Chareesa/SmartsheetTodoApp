@@ -1,0 +1,91 @@
+<div class="container">
+  <div class="row mt-5">
+    <div class="col-md-12 text-center">
+      <h1 class="h1-responsive">Smartsheet Todo App:</h1>
+      <p class="note">Note: Adding and removing tasks are visible upon refresh.</p>
+      <p class="note">Adding categories and tasks will only populate Uncategorized Tasks.</p>
+      <p class="note">Due dates can be added via Smartsheet.</p>
+      
+    </div>
+  </div>
+  <div class="row mt-5 ">
+    <div class="col-md-3 offset-md-2 left-column mb-1">
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center" (click)="onSelect()">
+          Uncategorized Tasks
+          <span class="badge primary-color badge-pill">{{countTodosByCat(0)}}</span>
+        </li>
+        <li *ngFor="let category of categories" class="list-group-item d-flex justify-content-between align-items-center" (click)="onSelect(category)">
+          {{category.name}}
+          <span class="badge primary-color badge-pill">{{countTodosByCat(category.categoryId)}}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <form>
+            <input mdbActive type="text" placeholder="Add new category" id="form1" class="form-control" [(ngModel)]="newCatText"
+              (keyup.enter)="addCategory()" name="addCat">
+          </form>
+          <span class="badge primary-color badge-pill">
+            <a class="prefix">
+              <i class="fa fa-plus" aria-hidden="true" (click)="addCategory()"></i>
+            </a>
+          </span>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-5 list mb-1" *ngIf="selectedCategory || selectedCategory === 0; else elseBlock">
+        <div class="row px-3 py-3">
+          <div class="col-md-12">
+            <h4>
+              {{selectedCategory.name}}
+              <span *ngIf="selectedCategory === 0">Uncategorized Tasks</span>
+            </h4>
+          </div>
+        </div>
+        <div class="row px-4 mt-3">
+          <div class="form-group full-width" *ngIf="todosForCat.length > 0">
+            <form class="full-width">
+              <div *ngFor="let todo of todosForCat">
+                <div class="view">
+                  <input type="checkbox" id="{{todo.categoryId}}" (click)="toggleCompletion(todo)" [checked]="todo.done">
+                  <label (dblclick)="editTodo(todo)">
+                    <span [ngClass]="{'strikethrough' : todo.done}">{{todo.name}}</span>
+                    <span [ngClass]="{'strikethrough' : todo.done}" *ngIf="todo.dueDate" class="dueDate">Due: {{todo.dueDate}}</span>
+                    <span [ngClass]="{'doneStatus' : todo.done}" *ngIf="todo.done">Done</span>
+                  </label>
+                  <button type="button" class="close" aria-label="Close" style="float: right;" (click)="remove(todo)">
+                    <span aria-hidden="true" >&times;</span>
+                  </button>
+                </div>
+                <input class="edit" *ngIf="todo.editing" [value]="todo.name" #editedtodo
+                         (blur)="stopEditing(todo, editedtodo.value)"
+                         (keyup.enter)="updateEditingTodo(todo, editedtodo.value)"
+                         (keyup.escape)="cancelEditingTodo(todo)">
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="row px-4 mt-1">
+          <div class="md-form">
+            <form>
+              <a class="prefix">
+                <i class="fa fa-plus prefix" (click)="addTodo()"></i>
+              </a>
+              <input mdbActive type="text" id="form2" class="form-control" [(ngModel)]="newTodoText" (keyup.enter)="addTodo()" name="addNew">
+              <label for="form2">Add new task</label>
+            </form>
+          </div>
+        </div>
+      </div>
+      <ng-template #elseBlock>
+        <div class="col-md-5 test 5 list text-center">
+          <h5 class="pt-3">Choose category from menu in the left.</h5>
+          <p class="pt-5">You can also create a new category by typing the name and pressing the enter or clicking on the
+            <span class="badge primary-color badge-pill">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+            </span>
+            button.
+          </p>
+        </div>
+      </ng-template>
+    </div>
+</div>
